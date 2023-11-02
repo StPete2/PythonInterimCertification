@@ -113,7 +113,7 @@ def Update_User(phone_dir_local: dict) -> dict:
     new_family_name = str(input("Введите новую фамилию пользователя: "))
     new_user_name = str(input("Введите новое имя пользователя: "))
     new_phone_number = str(input("Введите новый телефон пользователя: "))
-    new_discription = str(input("Введите новое описание пользователя: "))
+    new_description = str(input("Введите новое описание пользователя: "))
     update_confirmation = str(input(
         "Подтвердите внесение изменений, нажав 'Y'. Нажмите 'N' для возврата в главное меню: ")).capitalize()
     if update_confirmation == 'Y':
@@ -121,7 +121,7 @@ def Update_User(phone_dir_local: dict) -> dict:
         user.append(new_family_name)
         user.append(new_user_name)
         user.append(new_phone_number)
-        user.append(new_discription)
+        user.append(new_description)
         phone_dir_local[key_count_local] = user
         return phone_dir_local
     else:
@@ -171,8 +171,8 @@ def Import_Data(phone_dir_local: dict, key_count: int) -> dict:
     with open(file_name2, mode='rt', encoding='utf-8') as file:
         for line in file:
             key_count += 1
-            _, family_name, name, phone, discription = line.strip().split('#')
-            phone_dir_local[key_count] = [family_name, name, phone, discription]
+            _, family_name, name, phone, description = line.strip().split('#')
+            phone_dir_local[key_count] = [family_name, name, phone, description]
     print("Операция выполнена успешно.")
     print()
     return phone_dir_local, key_count
