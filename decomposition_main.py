@@ -33,12 +33,12 @@ def Menu():
             if key_count != 0:
                 if not asking_a_question():
                     key_count = search_User(phone_dir)
-                Update_User(phone_dir, key_count)
             else:
                 key_count = search_User(phone_dir)
-                Update_User(phone_dir, key_count)
-                print("заглушка")
-                # edit a note
+            user = Update_User(phone_dir, key_count)
+            save_note_after_editing(phone_dir, key_count)
+            print("заглушка")
+            # edit a note
 
         else:
             print("Вы ввели некорректное значение")
@@ -111,7 +111,7 @@ def asking_a_question() -> bool:
         return False
 
 
-def Update_User(phone_dir_local: dict, key_count_local: int) -> dict:
+def Update_User(phone_dir_local: dict, key_count_local: int) -> list:
     new_heading = str(input("Введите новое название заметки: "))
     new_body = str(input("Введите новое содержание заметки: "))
     new_data = datetime.now().date()
@@ -122,19 +122,26 @@ def Update_User(phone_dir_local: dict, key_count_local: int) -> dict:
         user.append(new_heading)
         user.append(new_body)
         user.append(new_data)
-        phone_dir_local[key_count_local] = user
-        return phone_dir_local
+        # phone_dir_local[key_count_local] = user
+        return user
+        # return phone_dir_local
     else:
-        return phone_dir_local
+        return
+        # return phone_dir_local
 
 
-def save_note_after_editing(phone_dir_local: dict, user: list, key_count_local: int):
+def save_note_after_editing(user: list, key_count_local: int):
     file_name = getFileName()
     # if not FileExists(file_name):
     #     print(f"{file_name} не существует, но будет создан")
 
-    with open(file_name, mode='w', encoding='utf-8') as file:
-        file.write(f"{key_count_local};{user[0]};{user[1]};{user[2]}\n")
+    with open(file_name, mode='rt', encoding='utf-8') as file:
+        for line in file:
+            key_count, _, _, _ = line.strip().split(';')
+            if key_count == key_count_local:
+                # phone_dir_local[key_count]
+                # with open(file_name, mode='w', encoding='utf-8') as file:
+                file.write(f"{key_count_local};{user[0]};{user[1]};{user[2]}\n")
     print("Заметка сохранена успешно.")
     print()
 
