@@ -28,15 +28,22 @@ def Menu():
             phone_dir = Import_Data(phone_dir)
             Print_Phone_Dir(phone_dir)
             key_count = search_User(phone_dir)
+            if key_count == 20000:
+                break
             print_Selected_Note(phone_dir, key_count)
         elif num == 4:  # editing a note
             if key_count != 0:
                 if not asking_a_question():
                     key_count = search_User(phone_dir)
             else:
+                phone_dir = Import_Data(phone_dir)
                 key_count = search_User(phone_dir)
+                if key_count == 10000:
+                    break
             user = Update_User(phone_dir, key_count)
-            save_note_after_editing(phone_dir, key_count)
+            if not user == phone_dir[key_count]:
+                save_note_after_editing(user, key_count)
+
             print("заглушка")
             # edit a note
 
@@ -92,7 +99,7 @@ def search_User(phone_dir_local: dict) -> int:
     print()
     if not input_data.isdigit():
         print("Вы ввели некорректное значение")
-        return
+        return 20000
 
     for key_count_found, user in phone_dir_local.items():
         if input_data == key_count_found:
@@ -100,7 +107,7 @@ def search_User(phone_dir_local: dict) -> int:
     else:
         print("Заметки с таким номером не существует.")
         print()
-        return
+        return 10000
 
 
 def asking_a_question() -> bool:
@@ -123,10 +130,11 @@ def Update_User(phone_dir_local: dict, key_count_local: int) -> list:
         user.append(new_body)
         user.append(new_data)
         # phone_dir_local[key_count_local] = user
+        # print(user + "заглушка")
         return user
         # return phone_dir_local
     else:
-        return
+        return phone_dir_local[key_count_local]
         # return phone_dir_local
 
 
@@ -135,13 +143,19 @@ def save_note_after_editing(user: list, key_count_local: int):
     # if not FileExists(file_name):
     #     print(f"{file_name} не существует, но будет создан")
 
-    with open(file_name, mode='rt', encoding='utf-8') as file:
-        for line in file:
-            key_count, _, _, _ = line.strip().split(';')
-            if key_count == key_count_local:
-                # phone_dir_local[key_count]
-                # with open(file_name, mode='w', encoding='utf-8') as file:
-                file.write(f"{key_count_local};{user[0]};{user[1]};{user[2]}\n")
+    with open(file_name, mode='r+', encoding='utf-8') as file:
+        lines = file.readlines()
+        a = int(key_count_local)-1
+        lines[a] = f"{key_count_local};{user[0]};{user[1]};{user[2]}\n"
+        # file.seek(0)
+        file.writelines(lines)
+        # for line in file.readlines():
+        #     print(line)
+        #     key_count, _, _, _ = line.strip().split(';')
+        #     if key_count == key_count_local:
+        #         # phone_dir_local[key_count]
+        #         # with open(file_name, mode='w', encoding='utf-8') as file:
+        #         file.write(f"{key_count_local};{user[0]};{user[1]};{user[2]}\n")
     print("Заметка сохранена успешно.")
     print()
 
