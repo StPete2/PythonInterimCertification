@@ -6,6 +6,7 @@ def Menu():
     print("Введите 2, если хотите вывести список заметок")
     print("Введите 3 для поиска заметки по её номеру")
     print("Введите 4 для редактирования заметки по её номеру")
+    print("Введите 5 для удаления заметки по номеру")
     key_count = 0
     # key_count = getKeyCount()
     phone_dir = dict()
@@ -46,6 +47,11 @@ def Menu():
 
             print("заглушка")
             # edit a note
+        elif num == 5:
+            phone_dir = Import_Data(phone_dir)
+            # phone_dir = Delete_User(phone_dir)
+            key_count = search_User(phone_dir)
+            delete_user_2(key_count)
 
         else:
             print("Вы ввели некорректное значение")
@@ -79,6 +85,7 @@ def Import_Data(phone_dir_local: dict) -> dict:
     with open(file_name, mode='rt', encoding='utf-8') as file:
         for line in file:
             key_count, heading, body, data = line.strip().split(';')
+            key_count = int(key_count)
             phone_dir_local[key_count] = [heading, body, data]
     print("Операция чтения заметок выполнена успешно.")
     print()
@@ -96,11 +103,11 @@ def Print_Phone_Dir(phone_dir_local: dict):
 
 def search_User(phone_dir_local: dict) -> int:
     input_data = input("Введите номер заметки: ")
-    print()
     if not input_data.isdigit():
         print("Вы ввели некорректное значение")
         return 20000
-
+    print()
+    input_data = int(input_data)
     for key_count_found, user in phone_dir_local.items():
         if input_data == key_count_found:
             return key_count_found
@@ -145,19 +152,32 @@ def save_note_after_editing(user: list, key_count_local: int):
 
     with open(file_name, mode='r+', encoding='utf-8') as file:
         lines = file.readlines()
-        a = int(key_count_local)-1
-        lines[a] = f"{key_count_local};{user[0]};{user[1]};{user[2]}\n"
-        # file.seek(0)
+        # lines[key_count_local-1] = f"{key_count_local};{user[0]};{user[1]};{user[2]}\n"
+        lines[key_count_local-1] = "\n"
+        file.seek(0)
         file.writelines(lines)
-        # for line in file.readlines():
-        #     print(line)
-        #     key_count, _, _, _ = line.strip().split(';')
-        #     if key_count == key_count_local:
-        #         # phone_dir_local[key_count]
-        #         # with open(file_name, mode='w', encoding='utf-8') as file:
-        #         file.write(f"{key_count_local};{user[0]};{user[1]};{user[2]}\n")
     print("Заметка сохранена успешно.")
     print()
+
+
+def Delete_User(phone_dir_local: dict) -> dict:
+    key_count_local = search_User(phone_dir_local)
+    del_confirmation = str(
+        input("Подтвердите удаление пользователя, нажав 'Y'. Нажмите 'N' для возврата в главное меню: ")).capitalize()
+    if del_confirmation == 'Y':
+        phone_dir_local.pop(key_count_local-1)
+        return phone_dir_local
+    else:
+        return phone_dir_local
+
+
+def delete_user_2(key_count_local: int):
+    file_name = getFileName()
+    with open(file_name, mode='r+', encoding='utf-8') as file:
+        lines = file.readlines()
+        lines.pop(key_count_local-1)
+        file.seek(0)
+        file.writelines(lines)
 
 
 def print_Selected_Note(phone_dir_local: dict, input_data: int):
