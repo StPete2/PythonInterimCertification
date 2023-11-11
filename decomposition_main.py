@@ -7,6 +7,7 @@ def Menu():
     print("Введите 3 для поиска заметки по её номеру и выводу содержания заметки")
     print("Введите 4 для редактирования заметки по её номеру")
     print("Введите 5 для удаления заметки по номеру")
+    print("Введите 6")
     key_count = 0
     # key_count = getKeyCount()
     phone_dir = dict()
@@ -51,8 +52,11 @@ def Menu():
                 break
             delete_note(phone_dir, key_count)
             renumber_keys(phone_dir, key_count)
-            # save_all_notes(phone_dir)
-            print("заглушка2")
+            save_all_notes(phone_dir)
+        elif num == 6:
+            a = getKeyCount2()
+            print(a)
+
         else:
             print("Вы ввели некорректное значение")
             print()
@@ -174,10 +178,11 @@ def renumber_keys(phone_dir_local: dict, key_count_local: int) -> dict:
         return phone_dir_local
     elif key_count_local != total_number_notes:
         for i in range(0, total_number_notes-key_count_local-1):
-            phone_dir_local[i + key_count_local] = phone_dir_local.get(i+key_count_local+1)
+            heading, note, data = phone_dir_local.get(i + key_count_local + 1)
+            user = [heading, note, data]
+            phone_dir_local[i + key_count_local] = user
             print(f"key = {i+key_count_local}; {phone_dir_local.get(i+key_count_local)}")
-        # phone_dir_local.pop(total_number_notes+1)
-        # print_all_notes(phone_dir_local)
+            phone_dir_local.pop(i+key_count_local+1)
         return phone_dir_local
 
 
@@ -204,7 +209,7 @@ def getFileName():
     return file_name
 
 
-def getKeyCount():
+def getKeyCount() -> int:
     key_count = 1
     file_name = getFileName()
     if not FileExists(file_name):
@@ -213,6 +218,17 @@ def getKeyCount():
     with open(file_name, mode='r', encoding='utf-8') as file:
         for line in file:
             key_count += 1
+    return key_count
+
+
+def getKeyCount2() -> int:
+    key_count = 1
+    file_name = getFileName()
+    if not FileExists(file_name):
+        return key_count
+    with open(file_name, mode='r', encoding='utf-8') as file:
+        key_count, _, _, _ = file.readlines()[-1].split(";")
+        key_count = int(key_count)
     return key_count
 
 
