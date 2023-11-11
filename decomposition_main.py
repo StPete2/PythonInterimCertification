@@ -20,13 +20,13 @@ def Menu():
         if num == 0:
             break
         elif num == 1:
-            user = Input_User()
+            user = input_note()
             save_one_note(user)
         elif num == 2:
-            phone_dir = Import_Data(phone_dir)
+            phone_dir = import_all_notes(phone_dir)
             print_all_notes(phone_dir)
         elif num == 3:
-            phone_dir = Import_Data(phone_dir)
+            phone_dir = import_all_notes(phone_dir)
             # Print_Phone_Dir(phone_dir)
             key_count = search_note(phone_dir)
             if key_count == 20000:
@@ -37,7 +37,7 @@ def Menu():
                 if not asking_a_question("отредактировать"):
                     key_count = search_note(phone_dir)
             else:
-                phone_dir = Import_Data(phone_dir)
+                phone_dir = import_all_notes(phone_dir)
                 key_count = search_note(phone_dir)
                 if key_count == 10000:
                     break
@@ -45,13 +45,13 @@ def Menu():
             save_all_notes(phone_dir)
 
         elif num == 5:  # delete a note
-            phone_dir = Import_Data(phone_dir)
+            phone_dir = import_all_notes(phone_dir)
             key_count = search_note(phone_dir)
             if key_count == 10000:
                 break
             delete_note(phone_dir, key_count)
-            # renumber_keys(phone_dir, key_count)
-            save_all_notes(phone_dir)
+            renumber_keys(phone_dir, key_count)
+            # save_all_notes(phone_dir)
             print("заглушка2")
         else:
             print("Вы ввели некорректное значение")
@@ -59,7 +59,7 @@ def Menu():
             break
 
 
-def Input_User() -> list:
+def input_note() -> list:
     user = []
     user.append(input("Введите заголовок заметки: "))
     user.append(input("Введите содержание заметки: "))
@@ -80,7 +80,7 @@ def save_one_note(user: list):
     print()
 
 
-def Import_Data(phone_dir_local: dict) -> dict:
+def import_all_notes(phone_dir_local: dict) -> dict:
     file_name = getFileName()
     with open(file_name, mode='rt', encoding='utf-8') as file:
         for line in file:
@@ -166,19 +166,18 @@ def delete_note(phone_dir_local: dict, key_count_local: int) -> dict:
 
 def renumber_keys(phone_dir_local: dict, key_count_local: int) -> dict:
     total_number_notes = getKeyCount()
-    if total_number_notes == key_count_local-1:
-        # file_name = getFileName()
-        # with open(file_name, mode='w', encoding='utf-8') as file:
-        #     file.write()
+    if total_number_notes == key_count_local-1:  # to delete a last note
         return phone_dir_local
     elif key_count_local == total_number_notes:
-        phone_dir_local[total_number_notes] = phone_dir_local[key_count_local+1]
-        phone_dir_local.pop(key_count_local+1)
+        phone_dir_local[total_number_notes] = phone_dir_local[total_number_notes+1]
+        phone_dir_local.pop(total_number_notes+1)
         return phone_dir_local
-    else:
-        for i in range(0, total_number_notes-key_count_local):
-            phone_dir_local[key_count_local] = phone_dir_local[key_count_local+1]
-        # phone_dir_local.pop(total_number_notes)
+    elif key_count_local != total_number_notes:
+        for i in range(0, total_number_notes-key_count_local-1):
+            phone_dir_local[i + key_count_local] = phone_dir_local.get(i+key_count_local+1)
+            print(f"key = {i+key_count_local}; {phone_dir_local.get(i+key_count_local)}")
+        # phone_dir_local.pop(total_number_notes+1)
+        # print_all_notes(phone_dir_local)
         return phone_dir_local
 
 
