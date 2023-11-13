@@ -7,10 +7,11 @@ def Menu():
     print("Введите 3 для поиска заметки по её номеру и выводу содержания заметки")
     print("Введите 4 для редактирования заметки по её номеру")
     print("Введите 5 для удаления заметки по номеру")
-    print("Введите 6")
+    print("Введите 6 для вывода списка заметок от конкретной даты")
     key_count = 0
     # key_count = getKeyCount()
     phone_dir = dict()
+    # phone_dir_sorted = dict()
     while True:
         num = input("Введите Ваш выбор: ")
         print()
@@ -54,9 +55,9 @@ def Menu():
             renumber_keys(phone_dir, key_count)
             save_all_notes(phone_dir)
         elif num == 6:
-            a = getKeyCount2()
-            print(a)
-
+            phone_dir = import_all_notes(phone_dir)
+            phone_dir_sorted = search_by_date(phone_dir)
+            print_all_notes(phone_dir_sorted)
         else:
             print("Вы ввели некорректное значение")
             print()
@@ -184,6 +185,20 @@ def renumber_keys(phone_dir_local: dict, key_count_local: int) -> dict:
             print(f"key = {i+key_count_local}; {phone_dir_local.get(i+key_count_local)}")
             phone_dir_local.pop(i+key_count_local+1)
         return phone_dir_local
+
+
+def search_by_date(phone_dir_local: dict) -> dict:
+    phone_dir_sorted = dict()
+    input_year = input("Введите год поиска заметок в формате XXXX: ")
+    input_month = input("Введите месяц создания или редактирования заметок в формате XX: ")
+    input_day = input("Введите день создания или редактирования заметки в формате XX: ")
+    # print(f"{input_year}, {input_month}, {input_day}")
+    for key_count, user in phone_dir_local.items():
+        year, month, day = user[2].split("-")
+        if (input_year == year) and (input_month == month) and (input_day == day):
+            phone_dir_sorted[key_count] = user
+            print("заглушка")
+    return phone_dir_sorted
 
 
 def print_selected_note(phone_dir_local: dict, input_data: int):
