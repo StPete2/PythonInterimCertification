@@ -8,16 +8,19 @@ def Menu():
     print("Введите 4 для редактирования заметки по её номеру")
     print("Введите 5 для удаления заметки по номеру")
     print("Введите 6 для вывода списка заметок от конкретной даты")
+    print("Введите 0 для завершения работы программы")
     key_count = 0
     # key_count = getKeyCount()
     phone_dir = dict()
+    file = getFileName()
+    if not FileExists(file):
+        create_file(file)
     # phone_dir_sorted = dict()
     while True:
         num = input("Введите Ваш выбор: ")
-        print()
         if not num.isdigit():
             print("Вы ввели некорректное значение")
-            break
+            continue
         num = int(num)
         if num == 0:
             break
@@ -29,10 +32,12 @@ def Menu():
             print_all_notes(phone_dir)
         elif num == 3:
             phone_dir = import_all_notes(phone_dir)
-            # Print_Phone_Dir(phone_dir)
+            if not phone_dir:
+                print("База данных не содержит ни одной заметки\n")
+                continue
             key_count = search_note(phone_dir)
             if key_count == 20000:
-                break
+                continue
             print_selected_note(phone_dir, key_count)
         elif num == 4:  # editing a note
             if key_count != 0:
@@ -40,28 +45,36 @@ def Menu():
                     key_count = search_note(phone_dir)
             else:
                 phone_dir = import_all_notes(phone_dir)
+                if not phone_dir:
+                    print("База данных не содержит ни одной заметки\n")
+                    continue
                 key_count = search_note(phone_dir)
                 if key_count == 10000:
-                    break
+                    continue
             phone_dir = update_note(phone_dir, key_count)
             save_all_notes(phone_dir)
 
         elif num == 5:  # delete a note
             phone_dir = import_all_notes(phone_dir)
+            if not phone_dir:
+                print("База данных не содержит ни одной заметки\n")
+                continue
             key_count = search_note(phone_dir)
             if key_count == 10000:
-                break
+                continue
             delete_note(phone_dir, key_count)
             renumber_keys(phone_dir, key_count)
             save_all_notes(phone_dir)
         elif num == 6:
             phone_dir = import_all_notes(phone_dir)
+            if not phone_dir:
+                print("База данных не содержит ни одной заметки\n")
+                continue
             phone_dir_sorted = search_by_date(phone_dir)
             print_all_notes(phone_dir_sorted)
         else:
             print("Вы ввели некорректное значение")
-            print()
-            break
+            continue
 
 
 def input_note() -> list:
@@ -76,13 +89,18 @@ def input_note() -> list:
 def save_one_note(user: list):
     file_name = getFileName()
     key_count = getKeyCount()
-    if not FileExists(file_name):
-        print(f"{file_name} не существует, но будет создан")
+    # if not FileExists(file_name):
+    #     print(f"{file_name} не существует, но будет создан")
 
     with open(file_name, mode='a', encoding='utf-8') as file:
         file.write(f"{key_count};{user[0]};{user[1]};{user[2]}\n")
     print("Заметка сохранена успешно.")
     print()
+
+
+def create_file(file: str):
+    with open(file, mode='w', encoding='utf-8') as file:
+        file.write("")
 
 
 def import_all_notes(phone_dir_local: dict) -> dict:
@@ -92,14 +110,14 @@ def import_all_notes(phone_dir_local: dict) -> dict:
             key_count, heading, body, data = line.strip().split(';')
             key_count = int(key_count)
             phone_dir_local[key_count] = [heading, body, data]
-    print("Операция чтения заметок выполнена успешно.")
-    print()
+    # print("Операция чтения заметок выполнена успешно.")
+    # print()
     return phone_dir_local
 
 
 def print_all_notes(phone_dir_local: dict):
     if not phone_dir_local:
-        print("База данных не содержит ни одной заметки")
+        print("База данных не содержит ни одной заметки\n")
         return
     for key_count, user in phone_dir_local.items():
         print(f"Номер: {key_count}. Заголовок: {user[0]}. Дата: {user[2]}")
@@ -130,7 +148,6 @@ def search_note(phone_dir_local: dict) -> int:
             return key_count_found
     else:
         print("Заметки с таким номером не существует.")
-        print()
         return 10000
 
 
@@ -147,7 +164,7 @@ def update_note(phone_dir_local: dict, key_count_local: int) -> dict:
     new_body = str(input("Введите новое содержание заметки: "))
     new_data = datetime.now().date()
     update_confirmation = str(input(
-        "Подтвердите внесение изменений, нажав 'Y'. Нажмите 'N' для возврата в главное меню: ")).capitalize()
+        "Подтвердите внесение изменений, нажав 'Y'.\nНажмите 'N' для возврата в главное меню: ")).capitalize()
     if update_confirmation == 'Y':
         user = []
         user.append(new_heading)
@@ -182,7 +199,6 @@ def renumber_keys(phone_dir_local: dict, key_count_local: int) -> dict:
             heading, note, data = phone_dir_local.get(i + key_count_local + 1)
             user = [heading, note, data]
             phone_dir_local[i + key_count_local] = user
-            print(f"key = {i+key_count_local}; {phone_dir_local.get(i+key_count_local)}")
             phone_dir_local.pop(i+key_count_local+1)
         return phone_dir_local
 
@@ -197,7 +213,6 @@ def search_by_date(phone_dir_local: dict) -> dict:
         year, month, day = user[2].split("-")
         if (input_year == year) and (input_month == month) and (input_day == day):
             phone_dir_sorted[key_count] = user
-            print("заглушка")
     return phone_dir_sorted
 
 
