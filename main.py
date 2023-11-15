@@ -71,7 +71,10 @@ def Menu():
                 print("База данных не содержит ни одной заметки\n")
                 continue
             phone_dir_sorted = search_by_date(phone_dir)
-            print_all_notes(phone_dir_sorted)
+            if not phone_dir_sorted:
+                print("Заметки за указанную дату не найдены\n")
+            else:
+                print_all_notes(phone_dir_sorted)
         else:
             print("Вы ввели некорректное значение")
             continue
